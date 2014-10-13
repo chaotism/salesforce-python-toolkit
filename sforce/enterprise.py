@@ -19,9 +19,6 @@ from base import SforceBaseClient
 import suds.sudsobject
 
 class SforceEnterpriseClient(SforceBaseClient):
-  def __init__(self, wsdl, **kwargs):
-    super(SforceEnterpriseClient, self).__init__(wsdl, **kwargs)
-
   # Core calls
 
   def convertLead(self, leadConverts):
