@@ -52,7 +52,7 @@ class SforceBaseClient(object):
   _sessionHeader = None
   _userTerritoryDeleteHeader = None
 
-  def __init__(self, wsdl, cacheDuration = 0, **kwargs):
+  def __init__(self, wsdl=None, cacheDuration = 0, suds_client=None, **kwargs):
     '''
     Connect to Salesforce
    
@@ -63,43 +63,50 @@ class SforceBaseClient(object):
     'username' : Username for HTTP auth when using a proxy ONLY
     'password' : Password for HTTP auth when using a proxy ONLY
     '''
-    # Suds can only accept WSDL locations with a protocol prepended
-    if '://' not in wsdl:
-      # TODO windows users???
-      # check if file exists, else let bubble up to suds as is
-      # definitely don't want to assume http or https
-      if os.path.isfile(wsdl):
-        wsdl = 'file://' + os.path.abspath(wsdl)
+    if suds_client is None:
+      # Suds can only accept WSDL locations with a protocol prepended
+      if '://' not in wsdl:
+        # TODO windows users???
+        # check if file exists, else let bubble up to suds as is
+        # definitely don't want to assume http or https
+        if os.path.isfile(wsdl):
+          wsdl = 'file://' + os.path.abspath(wsdl)
 
-    if cacheDuration > 0:
-      cache = FileCache()
-      cache.setduration(seconds = cacheDuration)
+      if cacheDuration > 0:
+        cache = FileCache()
+        cache.setduration(seconds = cacheDuration)
+      else:
+        cache = None
+
+      self._sforce = Client(wsdl, cache = cache)
+
+      # Set HTTP headers
+      headers = {'User-Agent': 'Salesforce/' + self._product + '/' + '.'.join(str(x) for x in self._version)}
+
+      # This HTTP header will not work until Suds gunzips/inflates the content
+      # 'Accept-Encoding': 'gzip, deflate'
+
+      self._sforce.set_options(headers = headers)
+
+      if kwargs.has_key('proxy'):
+        # urllib2 cannot handle HTTPS proxies yet (see bottom of README)
+        if kwargs['proxy'].has_key('https'):
+          raise NotImplementedError('Connecting to a proxy over HTTPS not yet implemented due to a \
+  limitation in the underlying urllib2 proxy implementation.  However, traffic from a proxy to \
+  Salesforce will use HTTPS.')
+        self._sforce.set_options(proxy = kwargs['proxy'])
+
+      if kwargs.has_key('username'):
+        self._sforce.set_options(username = kwargs['username'])
+
+      if kwargs.has_key('password'):
+        self._sforce.set_options(password = kwargs['password'])
+
     else:
-      cache = None
-    
-    self._sforce = Client(wsdl, cache = cache)
+      self._sforce = suds_client
 
-    # Set HTTP headers
-    headers = {'User-Agent': 'Salesforce/' + self._product + '/' + '.'.join(str(x) for x in self._version)}
-
-    # This HTTP header will not work until Suds gunzips/inflates the content
-    # 'Accept-Encoding': 'gzip, deflate'
-
-    self._sforce.set_options(headers = headers)
-
-    if kwargs.has_key('proxy'):
-      # urllib2 cannot handle HTTPS proxies yet (see bottom of README)
-      if kwargs['proxy'].has_key('https'):
-        raise NotImplementedError('Connecting to a proxy over HTTPS not yet implemented due to a \
-limitation in the underlying urllib2 proxy implementation.  However, traffic from a proxy to \
-Salesforce will use HTTPS.')
-      self._sforce.set_options(proxy = kwargs['proxy'])
-
-    if kwargs.has_key('username'):
-      self._sforce.set_options(username = kwargs['username'])
-
-    if kwargs.has_key('password'):
-      self._sforce.set_options(password = kwargs['password'])
+  def clone(self):
+    return type(self)(suds_client=self._sforce.clone())
 
   # Toolkit-specific methods
 

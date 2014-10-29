@@ -21,9 +21,6 @@ import string
 import suds.sudsobject
 
 class SforcePartnerClient(SforceBaseClient):
-  def __init__(self, wsdl, *args, **kwargs):
-    super(SforcePartnerClient, self).__init__(wsdl, *args, **kwargs)
-
   # Toolkit-specific calls
 
   def _stringifyResultRecords(self, struct):
