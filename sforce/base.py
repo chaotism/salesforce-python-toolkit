@@ -106,7 +106,7 @@ class SforceBaseClient(object):
       self._sforce = suds_client
 
   def clone(self):
-    return type(self)(suds_client=self._sforce)
+    return type(self)(suds_client=self._sforce.clone())
 
   # Toolkit-specific methods
 
