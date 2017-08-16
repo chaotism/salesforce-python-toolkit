@@ -1,3 +1,4 @@
+from __future__ import print_function
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the (LGPL) GNU Lesser General Public License as
 # published by the Free Software Foundation; either version 3 of the 
@@ -88,18 +89,18 @@ class SforceBaseClient(object):
 
       self._sforce.set_options(headers = headers)
 
-      if kwargs.has_key('proxy'):
+      if 'proxy' in kwargs:
         # urllib2 cannot handle HTTPS proxies yet (see bottom of README)
-        if kwargs['proxy'].has_key('https'):
+        if 'https' in kwargs['proxy']:
           raise NotImplementedError('Connecting to a proxy over HTTPS not yet implemented due to a \
   limitation in the underlying urllib2 proxy implementation.  However, traffic from a proxy to \
   Salesforce will use HTTPS.')
         self._sforce.set_options(proxy = kwargs['proxy'])
 
-      if kwargs.has_key('username'):
+      if 'username' in kwargs:
         self._sforce.set_options(username = kwargs['username'])
 
-      if kwargs.has_key('password'):
+      if 'password' in kwargs:
         self._sforce.set_options(password = kwargs['password'])
 
     else:
@@ -118,7 +119,7 @@ class SforceBaseClient(object):
     try:
       return self._sforce.factory.create(sObjectType)
     except:
-      print 'There is not a SOAP header of type %s' % sObjectType
+      print('There is not a SOAP header of type %s' % sObjectType)
 
   def generateObject(self, sObjectType):
     '''
