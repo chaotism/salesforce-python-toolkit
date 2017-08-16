@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the (LGPL) GNU Lesser General Public License as
 # published by the Free Software Foundation; either version 3 of the 
@@ -15,7 +16,7 @@
 # Written by: David Lanstein ( lanstein yahoo com )
 
 
-from base import SforceBaseClient
+from .base import SforceBaseClient
 
 import string
 import suds.sudsobject
