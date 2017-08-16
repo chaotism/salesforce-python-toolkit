@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='salesforce-python-toolkit',
-    version='0.1.4',
+    version='0.1.5',
     description='A fork of http://code.google.com/p/salesforce-python-toolkit/',
     url='http://github.com/BayCitizen/salesforce-python-toolkit',
     packages=[
